@@ -1,0 +1,14 @@
+{
+  "dependencies": {
+    "@react-three/drei": "^9.108.1",
+    "@react-three/fiber": "^8.16.8",
+    "@types/three": "^0.166.0",
+    "jotai": "^2.8.4",
+    "react-color": "^2.19.3",
+    "react-three-fiber": "^6.0.13",
+    "three": "^0.166.0"
+  },
+  "devDependencies": {
+    "@types/react-color": "^3.0.12"
+  }
+}
