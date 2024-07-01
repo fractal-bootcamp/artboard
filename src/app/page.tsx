@@ -6,7 +6,6 @@ import Feed from './components/socialfeed';
 import { useUser } from "@clerk/clerk-react";
 
 async function createOrUpdateUser(clerkIdentifier: string, fullName: string | null) {
-  console.log('ran create or update user')
   const response = await fetch('/api/user', {
     method: 'POST',
     headers: {

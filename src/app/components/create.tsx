@@ -2,8 +2,26 @@ import { Canvas, useFrame } from "react-three-fiber";
 import { OrbitControls, Stats, Text } from "@react-three/drei";
 import { useRef, useState } from 'react'
 import { ChromePicker, SketchPicker } from 'react-color';
+import { useUser } from "@clerk/clerk-react";
 
-function Box({ props, hoverColor, standardColor, size }: { props: any, hoverColor: string, standardColor: string, size: number }) {
+async function createPost(clerkIdentifier: string, color: string, size: number) {
+    console.log(clerkIdentifier, color, size)
+    const response = await fetch('/api/createPost', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ clerkIdentifier, color, size }),
+    });
+
+    if (!response.ok) {
+        console.error('Error creating/updating user');
+    }
+    console.log(response)
+}
+
+
+export function Box({ props, hoverColor, standardColor, size }: { props: any, hoverColor: string, standardColor: string, size: number }) {
     // This reference gives us direct access to the THREE.Mesh object
     const ref = useRef()
     // Hold state for hovered and clicked events
@@ -32,6 +50,7 @@ export default function Create() {
     const [displayColorPicker, setDisplayColorPicker] = useState(false);
     const [color, setColor] = useState('#fff');
     const [size, setSize] = useState(2);
+    const { user } = useUser();
 
     const handleClick = () => {
         setDisplayColorPicker(!displayColorPicker);
@@ -46,7 +65,7 @@ export default function Create() {
     };
 
     const handleSave = () => {
-        console.log(color, size)
+        createPost(user!.id, color, size);
     }
 
     const styles = {
@@ -116,7 +135,7 @@ export default function Create() {
                     </div>
 
                 </div>
-                <button className="btn mt-4">Save</button>
+                <button className="btn mt-4" onClick={() => handleSave()}>Save</button>
             </div>
         </>
     );
