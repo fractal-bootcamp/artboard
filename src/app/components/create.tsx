@@ -13,7 +13,6 @@ function Box({ props, hoverColor, standardColor, size }: { props: any, hoverColo
     useFrame((state, delta) => (ref.current.rotation.x += delta))
     // Return the view, these are regular Threejs elements expressed in JSX
 
-    console.log(hoverColor, standardColor)
 
     return (
         <mesh
