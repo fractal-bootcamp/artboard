@@ -24,8 +24,10 @@ export default async function handler(
       const newPost = await prisma.post.create({
         data: {
           userId: u!.id,
+          userName: u!.name,
           size: size,
           color: color,
+          likes: 0,
         },
       });
 
