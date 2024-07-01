@@ -7,17 +7,11 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  if (req.method === "POST") {
-    const { clerkIdentifier, fullName } = req.body;
-
+  if (req.method === "GET") {
     try {
-      const newUser = await prisma.user.upsert({
-        where: { clerkID: clerkIdentifier },
-        update: { clerkID: clerkIdentifier, name: fullName },
-        create: { clerkID: clerkIdentifier, name: fullName },
-      });
+      const posts = await prisma.post.findMany();
 
-      res.status(200).json(newUser);
+      res.status(200).json(posts);
     } catch (error) {
       res.status(500).json({ error: "Error creating/updating user" });
     }
