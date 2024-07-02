@@ -5,7 +5,8 @@ import { useEffect, useState } from "react";
 import { Canvas, useFrame } from "react-three-fiber";
 import { Box } from "./create";
 import { useUser } from "@clerk/nextjs";
-
+import { Model } from './MehulBeheraAvatar';
+import TextToSpeech from "./textToSpeech";
 
 async function getAllPosts() {
     const response = await fetch('/api/getAllPosts', {
@@ -85,6 +86,10 @@ function Post({ post, currentUser }: { post: Post, currentUser: string }) {
     const [likeCount, setLikeCount] = useState(0);
     const [isLiked, setIsLiked] = useState(false);
 
+
+    const voiceSet = window.speechSynthesis.getVoices();
+    const voice = voiceSet.find((v) => v.name === post.voice) || null;
+
     useEffect(() => {
         getLikeCount(post.id).then((data) => {
             setLikeCount(data);
@@ -94,18 +99,20 @@ function Post({ post, currentUser }: { post: Post, currentUser: string }) {
     return (
         <div className="relative">
 
-            <div className="flex size-96 shadow-lg rounded-2xl items-center justify-center">
+            <div className="flex w-96 h-96 shadow-lg rounded-2xl items-center justify-center">
+                <div className="flex h-full w-96 shadow-lg rounded-2xl items-center justify-center">
+                    <Canvas style={{ width: '100%', height: '100%' }}>
+                        <ambientLight intensity={Math.PI / 2} />
+                        <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} decay={0} intensity={Math.PI} />
+                        <pointLight position={[-10, -10, -10]} decay={0} intensity={Math.PI} />
+                        <Model position={[0, -1.5, 1]} />
+                        <OrbitControls />
+                    </Canvas>
+                </div>
 
-                <Canvas style={{ width: '100%', height: '100%' }}>
-                    <ambientLight intensity={Math.PI / 2} />
-                    <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} decay={0} intensity={Math.PI} />
-                    <pointLight position={[-10, -10, -10]} decay={0} intensity={Math.PI} />
-                    <Box position={[0, 0, 0]} hoverColor={post.color} standardColor='orange' size={post.size} />
-                    <OrbitControls />
-                </Canvas>
                 <div className="absolute bottom-0 left-0 p-2">
-                    <p>Created by: {post.userName}</p>
-                    <div className="flex flex-row">
+
+                    <div className="flex flex-row mb-2">
                         <button className="" onClick={async () => {
                             if (isLiked) {
                                 await handleRemoveLike(post.id, currentUser);
@@ -132,6 +139,13 @@ function Post({ post, currentUser }: { post: Post, currentUser: string }) {
                         </button>
                         <p>{likeCount}</p>
                     </div>
+                </div>
+                <div className="absolute bottom-0 right-0 p-2">
+                    <TextToSpeech text={post.text} voice={voice} pitch={post.pitch} rate={post.rate} volume={post.volume} btnSize="btn-xs" />
+                </div>
+
+                <div className="absolute top-0 left-0 p-2">
+                    <p>Created by: {post.userName}</p>
                 </div>
             </div>
         </div>

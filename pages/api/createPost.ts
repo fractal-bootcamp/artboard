@@ -8,7 +8,7 @@ export default async function handler(
   res: NextApiResponse
 ) {
   if (req.method === "POST") {
-    const { clerkIdentifier, size, color } = req.body;
+    const { clerkIdentifier, text, voice, pitch, rate, volume } = req.body;
 
     try {
       const u = await prisma.user.findUnique({
@@ -25,8 +25,11 @@ export default async function handler(
         data: {
           userId: u!.id,
           userName: u!.name,
-          size: size,
-          color: color,
+          text: text,
+          voice: voice,
+          pitch: pitch,
+          rate: rate,
+          volume: volume,
         },
       });
 
