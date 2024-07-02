@@ -40,7 +40,7 @@ export default function Home() {
           <div className="navbar-center hidden lg:flex">
             <div className="join">
               <SignedIn>
-                <input className="join-item btn w-auto" type="radio" name="options" aria-label="Art Builder" defaultChecked onClick={() => setPage('create')} />
+                <input className="join-item btn w-auto" type="radio" name="options" aria-label="Art Builder" onClick={() => setPage('create')} />
                 <input className="join-item btn w-auto" type="radio" name="options" aria-label="Social Feed" onClick={() => setPage('feed')} />
               </SignedIn>
             </div>

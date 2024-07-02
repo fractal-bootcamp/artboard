@@ -23,8 +23,11 @@ model User {
 
 model Post {
   id    Int     @id @default(autoincrement())
-  color String
-  size  Int
+  text String
+  voice String
+  pitch Float
+  rate Float
+  volume Float
   userName String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
