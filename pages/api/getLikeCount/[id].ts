@@ -1,5 +1,4 @@
-//take in clerk id and post id, add like to post
-
+//given a post id, return the number of likes
 import { PrismaClient } from "@prisma/client";
 import { NextApiRequest, NextApiResponse } from "next";
 
@@ -9,40 +8,27 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  if (req.method === "POST") {
-    console.log("reached add like function");
-    const { clerkIdentifier, postId } = req.body;
+  if (req.method === "GET") {
+    const postId = req.query.id;
 
     try {
-      const user = await prisma.user.findUnique({
-        where: {
-          clerkID: clerkIdentifier,
-        },
-      });
-
       const post = await prisma.post.findUnique({
         where: {
-          id: postId,
+          id: parseInt(postId as string),
         },
       });
-
-      if (user === null) {
-        res.status(400).json({ error: "User not found" });
-      }
 
       if (post === null) {
         res.status(400).json({ error: "Post not found" });
       }
 
-      //create like relation between u and post
-      if (user && post) {
-        const like = await prisma.like.create({
-          data: {
-            userId: user.id,
+      if (post) {
+        const likeCount = await prisma.like.count({
+          where: {
             postId: post.id,
           },
         });
-        res.status(200).json(like);
+        res.status(200).json(likeCount);
       }
     } catch (error) {
       res.status(500).json({ error: "Error creating post" });

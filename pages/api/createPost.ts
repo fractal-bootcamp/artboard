@@ -27,7 +27,6 @@ export default async function handler(
           userName: u!.name,
           size: size,
           color: color,
-          likes: 0,
         },
       });
 

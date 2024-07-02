@@ -1,5 +1,3 @@
-//take in clerk id and post id, add like to post
-
 import { PrismaClient } from "@prisma/client";
 import { NextApiRequest, NextApiResponse } from "next";
 
@@ -34,18 +32,20 @@ export default async function handler(
         res.status(400).json({ error: "Post not found" });
       }
 
-      //create like relation between u and post
+      //remove like
       if (user && post) {
-        const like = await prisma.like.create({
-          data: {
-            userId: user.id,
-            postId: post.id,
+        const like = await prisma.like.delete({
+          where: {
+            userId_postId: {
+              userId: user.id,
+              postId: post.id,
+            },
           },
         });
         res.status(200).json(like);
       }
     } catch (error) {
-      res.status(500).json({ error: "Error creating post" });
+      res.status(500).json({ error: "Error removing like" });
     }
   } else {
     res.status(405).json({ error: "Method not allowed" });

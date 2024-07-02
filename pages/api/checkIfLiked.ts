@@ -1,16 +1,13 @@
-//take in clerk id and post id, add like to post
-
+//given a  user and post, check if the user has liked the post
 import { PrismaClient } from "@prisma/client";
 import { NextApiRequest, NextApiResponse } from "next";
-
 const prisma = new PrismaClient();
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  if (req.method === "POST") {
-    console.log("reached add like function");
+  if (req.method === "GET") {
     const { clerkIdentifier, postId } = req.body;
 
     try {
@@ -34,18 +31,18 @@ export default async function handler(
         res.status(400).json({ error: "Post not found" });
       }
 
-      //create like relation between u and post
+      //return true if the user has liked the post
       if (user && post) {
-        const like = await prisma.like.create({
-          data: {
+        const like = await prisma.like.findFirst({
+          where: {
             userId: user.id,
             postId: post.id,
           },
         });
-        res.status(200).json(like);
+        res.status(200).json(like !== null);
       }
     } catch (error) {
-      res.status(500).json({ error: "Error creating post" });
+      res.status(500).json({ error: "Error checking if user has liked post" });
     }
   } else {
     res.status(405).json({ error: "Method not allowed" });

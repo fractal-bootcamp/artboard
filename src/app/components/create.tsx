@@ -141,6 +141,3 @@ export default function Create() {
     );
 }
 
-function useAtom(postFeedArray: any): [any, any] {
-    throw new Error("Function not implemented.");
-}

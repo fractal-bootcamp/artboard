@@ -1,8 +1,11 @@
-import { Post } from "@prisma/client";
+
+import type { Post } from "@prisma/client";
 import { OrbitControls } from "@react-three/drei";
 import { useEffect, useState } from "react";
 import { Canvas, useFrame } from "react-three-fiber";
 import { Box } from "./create";
+import { useUser } from "@clerk/nextjs";
+
 
 async function getAllPosts() {
     const response = await fetch('/api/getAllPosts', {
@@ -18,7 +21,76 @@ async function getAllPosts() {
     return response.json();
 }
 
-function Post({ post }: { post: Post }) {
+async function likePost(postId: number, clerkIdentifier: string) {
+    const response = await fetch('/api/addLike', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ postId, clerkIdentifier }),
+    });
+    return response;
+}
+
+async function removeLike(postId: number, clerkIdentifier: string) {
+    const response = await fetch('/api/removeLike', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ postId, clerkIdentifier }),
+    });
+    return response;
+}
+
+async function checkIfLiked(postId: number, clerkIdentifier: string) {
+    const response = await fetch('/api/checkIfLiked', {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ postId, clerkIdentifier }),
+    });
+    return response.json();
+}
+
+async function getLikeCount(postId: number) {
+    const response = await fetch(`/api/getLikeCount/${postId}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    });
+    return response.json();
+}
+
+async function handleCheckIfLiked(postId: number, clerkIdentifier: string) {
+    return await checkIfLiked(postId, clerkIdentifier);
+}
+
+async function handleLikeCount(postId: number) {
+    return await getLikeCount(postId);
+}
+
+async function handleLike(postId: number, clerkIdentifier: string) {
+    await likePost(postId, clerkIdentifier);
+}
+
+async function handleRemoveLike(postId: number, clerkIdentifier: string) {
+    await removeLike(postId, clerkIdentifier);
+}
+
+function Post({ post, currentUser }: { post: Post, currentUser: string }) {
+
+    const [likeCount, setLikeCount] = useState(0);
+    const [isLiked, setIsLiked] = useState(false);
+
+    useEffect(() => {
+        getLikeCount(post.id).then((data) => {
+            setLikeCount(data);
+        })
+    }, [isLiked])
+
     return (
         <div className="relative">
 
@@ -34,11 +106,20 @@ function Post({ post }: { post: Post }) {
                 <div className="absolute bottom-0 left-0 p-2">
                     <p>Created by: {post.userName}</p>
                     <div className="flex flex-row">
-                        <button className="">
+                        <button className="" onClick={async () => {
+                            if (isLiked) {
+                                await handleRemoveLike(post.id, currentUser);
+                                setLikeCount(likeCount - 1);
+                            } else {
+                                await handleLike(post.id, currentUser);
+                                setLikeCount(likeCount + 1);
+                            }
+                            setIsLiked(!isLiked);
+                        }}>
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
                                 className="h-6 w-6"
-                                fill="none"
+                                fill={isLiked ? "black" : "none"}
                                 viewBox="0 0 24 24"
                                 stroke="currentColor">
                                 <path
@@ -49,16 +130,15 @@ function Post({ post }: { post: Post }) {
 
                             </svg>
                         </button>
-                        <p> {post.likes}</p>
+                        <p>{likeCount}</p>
                     </div>
                 </div>
             </div>
-
         </div>
     )
 }
 
-function sortedList(posts: Post[]) {
+function sortByCreateDate(posts: Post[]) {
     return posts.sort((a, b) => b.createdAt < a.createdAt ? -1 : 1);
 }
 
@@ -66,6 +146,7 @@ function sortedList(posts: Post[]) {
 export default function Feed() {
 
     const [posts, setPosts] = useState<Post[]>([]);
+    const { user } = useUser();
 
     useEffect(() => {
         getAllPosts().then((data) => {
@@ -75,9 +156,9 @@ export default function Feed() {
         console.log(posts);
     }, [])
 
-    return (<div>{sortedList(posts).map((post) => {
+    return (<div>{sortByCreateDate(posts).map((post) => {
         return (
-            <Post post={post} />
+            <Post post={post} currentUser={user ? user.id : ''} />
         )
     })}</div>)
 
