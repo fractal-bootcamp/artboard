@@ -8,13 +8,13 @@ import TextToSpeech from "./textToSpeech";
 
 
 
-async function createPost(clerkIdentifier: string, text: string, voice: string, pitch: number, rate: number, volume: number) {
+async function createPost(clerkIdentifier: string, text: string, voice: string, pitch: number, rate: number, volume: number, image: string) {
     const response = await fetch('/api/createPost', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ clerkIdentifier, text, voice, pitch, rate, volume }),
+        body: JSON.stringify({ clerkIdentifier, text, voice, pitch, rate, volume, image }),
     });
 
     if (!response.ok) {
@@ -39,7 +39,13 @@ export default function Create() {
     }, []);
 
     const handleSave = () => {
-        createPost(user!.id, text, voiceName, pitch, rate, volume);
+        if (image === '') {
+            console.log("No image generated");
+            return;
+        }
+        if (image !== '') {
+            createPost(user!.id, text, voiceName, pitch, rate, volume, image);
+        }
 
     }
 
@@ -85,8 +91,11 @@ export default function Create() {
         <>
             <div className="flex flex-col items-center justify-center">
                 <div className="flex flex-row items-center gap-2 justify-center h-screen w-screen">
-                    <img className="rounded-2xl shadow-lg" src={image} alt="Generated Image" />
                     <div className="h-1/2 w-96 shadow-lg rounded-2xl flex flex-col items-center justify-center">
+                        {image !== '' && <img className="rounded-2xl shadow-lg" src={image} alt="Generated Image" />}
+                    </div>
+                    <div className="h-1/2 w-96 shadow-lg rounded-2xl flex flex-col items-center justify-center">
+
                         <p className="text-bold text-xl mb-4">Options</p>
                         <textarea className="textarea textarea-bordered w-11/12 my-4" placeholder="What do you want to say?" onChange={(e) => setText(e.target.value)}></textarea>
                         <div className="my-4">

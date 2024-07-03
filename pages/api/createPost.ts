@@ -8,7 +8,8 @@ export default async function handler(
   res: NextApiResponse
 ) {
   if (req.method === "POST") {
-    const { clerkIdentifier, text, voice, pitch, rate, volume } = req.body;
+    const { clerkIdentifier, text, voice, pitch, rate, volume, image } =
+      req.body;
 
     try {
       const u = await prisma.user.findUnique({
@@ -30,6 +31,7 @@ export default async function handler(
           pitch: pitch,
           rate: rate,
           volume: volume,
+          image: image,
         },
       });
 
