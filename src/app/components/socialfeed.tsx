@@ -3,7 +3,6 @@ import type { Post } from "@prisma/client";
 import { OrbitControls } from "@react-three/drei";
 import { useEffect, useState } from "react";
 import { Canvas, useFrame } from "react-three-fiber";
-import { Box } from "./create";
 import { useUser } from "@clerk/nextjs";
 import { Model } from './MehulBeheraAvatar';
 import TextToSpeech from "./textToSpeech";
@@ -165,9 +164,7 @@ export default function Feed() {
     useEffect(() => {
         getAllPosts().then((data) => {
             setPosts(data)
-            console.log("data, ", data);
         })
-        console.log(posts);
     }, [])
 
     return (<div>{sortByCreateDate(posts).map((post) => {
