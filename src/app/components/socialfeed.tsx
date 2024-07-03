@@ -161,10 +161,16 @@ export default function Feed() {
         })
     }, [])
 
-    return (<div>{sortByCreateDate(posts).map((post) => {
-        return (
-            <Post post={post} currentUser={user ? user.id : ''} />
-        )
-    })}</div>)
+    return (
+        <div className="carousel carousel-vertical rounded-box h-96">
+            {sortByCreateDate(posts).map((post) => {
+                return (
+                    <div className="carousel-item h-full" key={post.id}>
+                        <Post post={post} currentUser={user ? user.id : ''} />
+                    </div>
+                );
+            })}
+        </div>
+    )
 
 }

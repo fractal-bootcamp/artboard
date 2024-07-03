@@ -91,7 +91,7 @@ export default function Create() {
         <>
             <div className="flex flex-col items-center justify-center">
                 <div className="flex flex-row items-center gap-2 justify-center h-screen w-screen">
-                    <div className="h-1/2 w-96 shadow-lg rounded-2xl flex flex-col items-center justify-center">
+                    <div className="h-1/2 w-1/4 shadow-lg rounded-2xl flex flex-col items-center justify-center">
                         {image !== '' && <img className="rounded-2xl shadow-lg" src={image} alt="Generated Image" />}
                     </div>
                     <div className="h-1/2 w-96 shadow-lg rounded-2xl flex flex-col items-center justify-center">
