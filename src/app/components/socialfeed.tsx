@@ -3,7 +3,6 @@ import type { Post } from "@prisma/client";
 import { OrbitControls } from "@react-three/drei";
 import { useEffect, useState } from "react";
 import { Canvas, useFrame } from "react-three-fiber";
-import { Box } from "./create";
 import { useUser } from "@clerk/nextjs";
 import { Model } from './MehulBeheraAvatar';
 import TextToSpeech from "./textToSpeech";
@@ -101,13 +100,7 @@ function Post({ post, currentUser }: { post: Post, currentUser: string }) {
 
             <div className="flex w-96 h-96 shadow-lg rounded-2xl items-center justify-center">
                 <div className="flex h-full w-96 shadow-lg rounded-2xl items-center justify-center">
-                    <Canvas style={{ width: '100%', height: '100%' }}>
-                        <ambientLight intensity={Math.PI / 2} />
-                        <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} decay={0} intensity={Math.PI} />
-                        <pointLight position={[-10, -10, -10]} decay={0} intensity={Math.PI} />
-                        <Model position={[0, -1.5, 1]} />
-                        <OrbitControls />
-                    </Canvas>
+                    <img className="rounded-2xl shadow-lg" src={post.image} alt="Generated Image" />
                 </div>
 
                 <div className="absolute bottom-0 left-0 p-2">
@@ -125,8 +118,8 @@ function Post({ post, currentUser }: { post: Post, currentUser: string }) {
                         }}>
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
-                                className="h-6 w-6"
-                                fill={isLiked ? "black" : "none"}
+                                className="h-6 w-6 text-white"
+                                fill={isLiked ? "white" : "none"}
                                 viewBox="0 0 24 24"
                                 stroke="currentColor">
                                 <path
@@ -137,7 +130,7 @@ function Post({ post, currentUser }: { post: Post, currentUser: string }) {
 
                             </svg>
                         </button>
-                        <p>{likeCount}</p>
+                        <p className="text-white">{likeCount}</p>
                     </div>
                 </div>
                 <div className="absolute bottom-0 right-0 p-2">
@@ -145,7 +138,7 @@ function Post({ post, currentUser }: { post: Post, currentUser: string }) {
                 </div>
 
                 <div className="absolute top-0 left-0 p-2">
-                    <p>Created by: {post.userName}</p>
+                    <p className="text-white">Created by: {post.userName}</p>
                 </div>
             </div>
         </div>
@@ -165,9 +158,7 @@ export default function Feed() {
     useEffect(() => {
         getAllPosts().then((data) => {
             setPosts(data)
-            console.log("data, ", data);
         })
-        console.log(posts);
     }, [])
 
     return (<div>{sortByCreateDate(posts).map((post) => {

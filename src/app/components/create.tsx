@@ -6,57 +6,31 @@ import { useUser } from "@clerk/clerk-react";
 import { Model } from './MehulBeheraAvatar';
 import TextToSpeech from "./textToSpeech";
 
-async function createPost(clerkIdentifier: string, text: string, voice: string, pitch: number, rate: number, volume: number) {
-    console.log(clerkIdentifier, text, voice, pitch, rate, volume)
+
+
+async function createPost(clerkIdentifier: string, text: string, voice: string, pitch: number, rate: number, volume: number, image: string) {
     const response = await fetch('/api/createPost', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ clerkIdentifier, text, voice, pitch, rate, volume }),
+        body: JSON.stringify({ clerkIdentifier, text, voice, pitch, rate, volume, image }),
     });
 
     if (!response.ok) {
         console.error('Error creating/updating user');
     }
-    console.log(response)
-}
-
-
-export function Box({ props, hoverColor, standardColor, size }: { props: any, hoverColor: string, standardColor: string, size: number }) {
-    // This reference gives us direct access to the THREE.Mesh object
-    const ref = useRef()
-    // Hold state for hovered and clicked events
-    const [hovered, hover] = useState(false)
-    const [clicked, click] = useState(false)
-    // Subscribe this component to the render-loop, rotate the mesh every frame
-    useFrame((state, delta) => (ref.current.rotation.x += delta))
-    // Return the view, these are regular Threejs elements expressed in JSX
-
-
-    return (
-        <mesh
-            {...props}
-            ref={ref}
-            scale={clicked ? size : 1}
-            onClick={(event) => click(!clicked)}
-            onPointerOver={(event) => (event.stopPropagation(), hover(true))}
-            onPointerOut={(event) => hover(false)}>
-            <boxGeometry args={[1, 1, 1]} />
-            <meshStandardMaterial color={hovered ? hoverColor : standardColor} />
-        </mesh>
-    )
 }
 
 export default function Create() {
-    const [color, setColor] = useState('#fff');
-    const [size, setSize] = useState(2);
     const [text, setText] = useState('');
     const [voice, setVoice] = useState<SpeechSynthesisVoice | null>(null);
     const [voiceName, setVoiceName] = useState('');
     const [pitch, setPitch] = useState(1);
     const [rate, setRate] = useState(1);
     const [volume, setVolume] = useState(1);
+    const [image, setImage] = useState('');
+
     const { user } = useUser();
 
     useEffect(() => {
@@ -65,7 +39,32 @@ export default function Create() {
     }, []);
 
     const handleSave = () => {
-        createPost(user!.id, text, voiceName, pitch, rate, volume);
+        if (image === '') {
+            console.log("No image generated");
+            return;
+        }
+        if (image !== '') {
+            createPost(user!.id, text, voiceName, pitch, rate, volume, image);
+        }
+
+    }
+
+    const handleGenerate = () => {
+        async function generateImage() {
+            const params = new URLSearchParams({
+                text,
+            });
+
+            const response = await fetch(`/api/generateImage?${params.toString()}`);
+            if (response.ok) {
+                const data = await response.json();
+                setImage(data);
+                console.log(data); // Assuming the response contains an 'imageUrl' field
+            } else {
+                console.error('Error generating image');
+            }
+        }
+        generateImage();
     }
 
     const handleVoiceChange = (event: ChangeEvent<HTMLSelectElement>) => {
@@ -92,16 +91,11 @@ export default function Create() {
         <>
             <div className="flex flex-col items-center justify-center">
                 <div className="flex flex-row items-center gap-2 justify-center h-screen w-screen">
-                    <div className="flex h-1/2 w-96 shadow-lg rounded-2xl items-center justify-center">
-                        <Canvas style={{ width: '100%', height: '100%' }}>
-                            <ambientLight intensity={Math.PI / 2} />
-                            <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} decay={0} intensity={Math.PI} />
-                            <pointLight position={[-10, -10, -10]} decay={0} intensity={Math.PI} />
-                            <Model position={[0, -1.5, 1]} />
-                            <OrbitControls />
-                        </Canvas>
+                    <div className="h-1/2 w-96 shadow-lg rounded-2xl flex flex-col items-center justify-center">
+                        {image !== '' && <img className="rounded-2xl shadow-lg" src={image} alt="Generated Image" />}
                     </div>
                     <div className="h-1/2 w-96 shadow-lg rounded-2xl flex flex-col items-center justify-center">
+
                         <p className="text-bold text-xl mb-4">Options</p>
                         <textarea className="textarea textarea-bordered w-11/12 my-4" placeholder="What do you want to say?" onChange={(e) => setText(e.target.value)}></textarea>
                         <div className="my-4">
@@ -167,15 +161,26 @@ export default function Create() {
                         </div>
 
                         <TextToSpeech text={text} voice={voice} pitch={pitch} rate={rate} volume={volume} btnSize="" />
-
+                        <button className="btn mt-4 w-20" onClick={() => handleGenerate()}>Generate</button>
                         <button className="btn mt-4 w-20" onClick={() => handleSave()}>Save</button>
                     </div>
+
                 </div>
 
             </div>
         </>
     );
 }
+
+// <div className="flex h-1/2 w-96 shadow-lg rounded-2xl items-center justify-center">
+//                         <Canvas style={{ width: '100%', height: '100%' }}>
+//                             <ambientLight intensity={Math.PI / 2} />
+//                             <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} decay={0} intensity={Math.PI} />
+//                             <pointLight position={[-10, -10, -10]} decay={0} intensity={Math.PI} />
+//                             <Model position={[0, -1.5, 1]} />
+//                             <OrbitControls />
+//                         </Canvas>
+//                     </div>
 
 // <Canvas style={{ width: '100%', height: '100%' }}>
 //     <ambientLight intensity={Math.PI / 2} />

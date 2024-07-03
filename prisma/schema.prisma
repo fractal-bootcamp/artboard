@@ -28,6 +28,7 @@ model Post {
   pitch Float
   rate Float
   volume Float
+  image String
   userName String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
