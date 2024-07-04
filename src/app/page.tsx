@@ -28,6 +28,8 @@ export default function Home() {
     if (isSignedIn) {
       createOrUpdateUser(user.id, user.fullName);
     }
+
+    console.log("do it")
   }, [isSignedIn, user])
 
   return (
